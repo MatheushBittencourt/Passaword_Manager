@@ -1,11 +1,183 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-    <head th:include="layout :: htmlhead"></head>
-    <body>
-        
-        <nav th:replace="layout :: menu">(menu)</nav>
 
-        <h1>qq coisa</h1>
-        <div th:include="layout :: footer">(footer)</div>
-    </body>
+<head th:include="layout :: htmlhead"></head>
+
+<body>
+
+    <nav th:replace="layout :: menu">(menu)</nav>
+    <div class="container main-container pt-5">
+        <div class="col-12">
+            <div class="row">
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-4">Todas as senhas</h4>
+                    <!-- Botão que irá abrir o modal -->
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg btn-circle" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop">
+                        <i class="fas fa-plus"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Serviço</th>
+                    <th scope="col">Nome de Usuário</th>
+                    <th scope="col">Senha</th>
+                    <th scope="col">Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="password : ${listaPassword}">
+                    <td th:text="${password.id}">1</td>
+                    <td th:text="${password.toolName}">Ferramenta</td>
+                    <td th:text="${password.email}">email@example.com</td>
+                    <td th:text="${password.password}">senha</td>
+                    <td>
+                        <a th:href="@{/password/alterar/{id}(id=${password.id})}" class="btn btn-warning">Alterar</a>
+                        <a th:href="@{/password/delete/{id}(id=${password.id})}" class="btn btn-danger">Excluir</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Cadastro de senha</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/passwords}" method="post" th:object="${password}">
+                        <input type="hidden" th:field="*{id}" />
+                        <div class="container">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="name" class="form-label">Ferramenta</label>
+                                    <input type="text" class="form-control" id="name" th:field="*{toolName}" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="email" class="form-label">Email address</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}"
+                                        placeholder="name@example.com">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password"
+                                            th:field="*{password}">
+                                        <span class="input-group-text" id="generatePassword"><i
+                                                class="fas fa-random"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck1"
+                                            onclick="togglePasswordVisibility()">
+                                        <label class="form-check-label" for="exampleCheck1">Visualizar senha</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="passwordLength" class="form-label">Quantidade de caracteres: <span
+                                            id="passwordLengthValue" th:text="*{passwordLength}">12</span></label>
+                                    <input type="range" class="form-range" id="passwordLength" min="6" max="128"
+                                        th:field="*{passwordLength}" oninput="updatePasswordLengthValue(this.value)">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="includeUppercase"
+                                            th:field="*{includeUppercase}">
+                                        <label class="form-check-label" for="includeUppercase">Letras maiúsculas</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="includeNumbers"
+                                            th:field="*{includeNumbers}">
+                                        <label class="form-check-label" for="includeNumbers">Números</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="includeSymbols"
+                                            th:field="*{includeSymbols}">
+                                        <label class="form-check-label" for="includeSymbols">Símbolos</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="category" class="form-label">Categoria</label>
+                                    <select class="form-select" id="category" th:field="*{category}"
+                                        aria-label="Default select example">
+                                        <option selected>Selecione uma categoria</option>
+                                        <option th:value="1">Faculdade</option>
+                                        <option th:value="2">Trabalho</option>
+                                        <option th:value="3">Pessoal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="modalcliente">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Excluir Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Confirma a exclusão do cliente?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                    <button type="button" class="btn btn-primary" id="btnsim">Sim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="successAnimation" class="success-animation">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <div th:include="layout :: footer">(footer)</div>
+</body>
+
 </html>
