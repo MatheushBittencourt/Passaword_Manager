@@ -32,16 +32,15 @@ public class PasswordController {
 
     @PostMapping
     public ModelAndView save(Password password){
-        service.save(password); // Aqui você salva o objeto 
+        service.save(password); 
         return new ModelAndView("redirect:/passwords");
     }
 
     @GetMapping("/alterar/{id}")
     public ModelAndView alterar(@PathVariable("id") long id){
-        // Cria um novo objeto Password vazio
         var password = new Password();
-        password.setId(id); // Define o id
-        return new ModelAndView("password/form", "password", password); // Envia o id para a view
+        password.setId(id); 
+        return new ModelAndView("password/form", "password", password);
     }
 
     @GetMapping("/delete/{id}")
